@@ -2,3 +2,5 @@
 g++ imageServidor.cpp SocketDatagrama.cpp PaqueteDatagrama.cpp -o servidor -std=c++14
 // Cliente
 g++ imageCliente.cpp IP.cpp SocketDatagrama.cpp PaqueteDatagrama.cpp -o cliente -std=c++14
+
+export DISPLAY=:0

@@ -12,40 +12,64 @@
 #include <cstring>
 using namespace std;
 
-SocketDatagrama::SocketDatagrama(int puerto)
-{
-	s = socket(AF_INET, SOCK_DGRAM, 0);
-   	/* rellena la dirección local */
-   	bzero((char *)&direccionLocal, sizeof(direccionLocal));
+SocketDatagrama::SocketDatagrama(int puerto) {
+	bzero((char *)&direccionLocal, sizeof(direccionLocal));
+    bzero((char *)&direccionForanea, sizeof(direccionForanea));
+	
+	if((s = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		perror("Socket failed");
+		exit(EXIT_FAILURE);
+	}
+   	// Rellena la dirección local
    	direccionLocal.sin_family = AF_INET;
    	direccionLocal.sin_addr.s_addr = INADDR_ANY;
-   	direccionLocal.sin_port = htons(puerto);
-	bind(s, (struct sockaddr *)&direccionLocal, sizeof(direccionLocal));
-	/* rellena la dirección foranea */
-   	bzero((char *)&direccionForanea, sizeof(direccionForanea));
-	
+
+   	if(puerto == 0)
+	   	direccionLocal.sin_port = htons(puerto);
+	else
+		direccionLocal.sin_port = puerto;
+
+	if(bind(s, (struct sockaddr *)&direccionLocal, sizeof(direccionLocal)) < 0) {
+		perror("Bind failed");
+		exit(EXIT_FAILURE);
+	}
 }
-SocketDatagrama::~SocketDatagrama()
-{
+SocketDatagrama::~SocketDatagrama() {
 	close(s);
 }
-//Recibe un paquete tipo datagrama proveniente de este socket
-int SocketDatagrama::recibe(PaqueteDatagrama & p)
-{
+
+// Recibe un paquete tipo datagrama proveniente de este socket
+int SocketDatagrama::recibe(PaqueteDatagrama & p) {
+	unsigned int clen = sizeof(direccionForanea);
+	int res = recvfrom(s, (char *)p.obtieneDatos(), p.obtieneLongitud() * sizeof(char), 0, (struct sockaddr *)&direccionForanea, &clen);
+
 	unsigned char inet[4];
-	unsigned int clen=sizeof(direccionForanea);
-	int res= recvfrom(s, (char *)p.obtieneDatos(),p.obtieneLongitud(), 0,(struct sockaddr *)&direccionForanea,&clen);
-	// COPIAR A INET
+	// Copiar a INET
    	memcpy(inet, &direccionForanea.sin_addr.s_addr, 4);
-	p.inicializaIp((char*)inet);
-	p.inicializaPuerto(ntohs(direccionForanea.sin_port));
+
+   	string ip1 = to_string(inet[0]);
+   	string ip2 = to_string(inet[1]);
+   	string ip3 = to_string(inet[2]);
+   	string ip4 = to_string(inet[3]);
+
+   	ip1.append(".");
+   	ip1.append(ip2);
+   	ip1.append(".");
+   	ip1.append(ip3);
+   	ip1.append(".");
+   	ip1.append(ip4);
+
+   	//printf("\n");
+   	char dirIP[16];
+   	strcpy(dirIP, ip1.c_str());
+	p.inicializaIp(dirIP);
+	p.inicializaPuerto(direccionForanea.sin_port);	
 	return res;
 }
 //Envía un paquete tipo datagrama desde este socket
-int SocketDatagrama::envia(PaqueteDatagrama & p)
-{
+int SocketDatagrama::envia(PaqueteDatagrama & p) {
 	direccionForanea.sin_family = AF_INET;
    	direccionForanea.sin_addr.s_addr = inet_addr(p.obtieneDireccion());
-   	direccionForanea.sin_port = htons(p.obtienePuerto());
-	return sendto(s, (char *)p.obtieneDatos(),p.obtieneLongitud(), 0, (struct sockaddr *) &direccionForanea, sizeof(direccionForanea));
+   	direccionForanea.sin_port = p.obtienePuerto();
+	return sendto(s, (char *)p.obtieneDatos(), p.obtieneLongitud() *  sizeof(char), 0, (struct sockaddr *) &direccionForanea, sizeof(direccionForanea));
 }
