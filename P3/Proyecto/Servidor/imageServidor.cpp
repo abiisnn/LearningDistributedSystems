@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include<bits/stdc++.h>
-#define TAM 2000
+#define TAM 3500
 #define PUERTO 1234
 using namespace std;
 

@@ -2,7 +2,7 @@
 #include "gfx.h"
 #include<bits/stdc++.h>
 #define lon 30
-#define r 800
+#define r 500
 using namespace std;
 
 int main() {

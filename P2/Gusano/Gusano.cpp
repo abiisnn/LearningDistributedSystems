@@ -89,7 +89,7 @@ void Gusano::crearGrados() {
 void Gusano::circulo() {
 	double auxX, auxY;
 	for(double i = grados; i < grados + longitud; i++) {
-		gfx_point(X+xCirculo[i], Y+yCirculo[i]);
+		gfx_point(X + xCirculo[i], Y + yCirculo[i]);
 	}
 }
 void Gusano::moverCirculo() {

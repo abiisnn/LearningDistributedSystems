@@ -4,24 +4,26 @@
 #include <cstring>
 #include <iostream>
 #include<bits/stdc++.h>
-#define TAM 2000
+#define TAM 3500
 #define PUERTO 7200
 using namespace std;
 
 int main(void) {
 	int time, res, last;
 	string srt, firstPart, lastNumber;
-	cin >> time >> res >> srt;
-	IP ip(srt);
-	firstPart = ip.getFirst();
-	last = ip.getLast();
+	// cin >> time >> res >> srt;
+	// IP ip(srt);
+	// firstPart = ip.getFirst();
+	// last = ip.getLast();
+	cin >> time >> res;
 	int tiempoPrueba = 1;
 	while(1) {
 		// ENVIAR SOLICITUD
-		for(int i = 0, last = ip.getLast(); i < 5; i++, last++) {
-			srt = firstPart + to_string(last);
+//		for(int i = 0, last = ip.getLast(); i < 2; i++, last++) {
+		for(int i = 0; i < 2; i++) {
+			//srt = firstPart + to_string(last);
+			cin >> srt;
 			cout << "------------- Enviando solicitud a: " << srt << endl; 		
-
     		char char_array[srt.length() + 1];   
     		strcpy(char_array, srt.c_str()); 
 			
@@ -69,6 +71,7 @@ int main(void) {
 								}
 							}
 							out.close();
+							std::this_thread::sleep_for(std::chrono::milliseconds(500));
 						}
 					}
 				} catch(const char *mensaje) {
